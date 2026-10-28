@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Urban Prep | نظام إدارة الطلبيات والفواتير والحسابات المالية</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            indigo: {
+              50: '#f4f7ee', 100: '#e6eed8', 200: '#cde0b4', 300: '#adc988', 400: '#89ae5c',
+              500: '#648238', 600: '#4b6326', 700: '#3b4e1d', 800: '#2f3e18', 900: '#253113', 950: '#18210b'
+            },
+            olive: {
+              50: '#f4f7ee', 100: '#e6eed8', 200: '#cde0b4', 300: '#adc988', 400: '#89ae5c',
+              500: '#648238', 600: '#4b6326', 700: '#3b4e1d', 800: '#2b3a15', 900: '#1f2b0f', 950: '#141c09'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    * { font-family: 'Cairo', 'Inter', sans-serif; box-sizing: border-box; }
+    body { background-color: #f6f8f3; color: #1a2412; overflow-x: hidden; }
+    .num-font { font-family: 'Inter', 'Cairo', sans-serif; }
+    header.bg-slate-900, .bg-slate-900 { background-color: #243015 !important; }
+    .bg-slate-800\/90, .bg-slate-800 { background-color: #2f3e1b !important; }
+    .border-slate-700\/80, .border-slate-700, .border-slate-800 { border-color: #3f5225 !important; }
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #eef2e6; }
+    ::-webkit-scrollbar-thumb { background: #9db37c; border-radius: 9999px; }
+    .order-input:focus { outline: none; border-color: #4b6326; box-shadow: 0 0 0 3px rgba(75, 99, 38, 0.22); background-color: #f4f7ee; }
+    .order-input.has-val { background-color: #e6eed8; border-color: #4b6326; color: #1f2b0f; font-weight: 800; }
+    #invoice-render-area { background: #ffffff; color: #0f172a; }
+    @media print {
+      body * { visibility: hidden; }
+      #invoice-print-wrapper, #invoice-print-wrapper * { visibility: visible; }
+      #invoice-print-wrapper { position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; box-shadow: none !important; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+
+  <!-- Top Header -->
+  <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-30 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#648238] to-[#3b4e1d] border border-[#adc988]/40 flex items-center justify-center text-white font-extrabold text-lg shadow-md tracking-wider num-font">
+          UP
+        </div>
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-wide text-white num-font">URBAN PREP</h1>
+            <span class="bg-[#648238]/30 border border-[#adc988]/40 text-[#e6eed8] text-xs px-2.5 py-0.5 rounded-full font-bold">Royal Olive Edition</span>
+          </div>
+          <p class="text-xs text-[#cde0b4]">We prep. You serve • نظام إدارة الطلبيات والعهد والواتساب</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2.5">
+        <button id="btn-go-ordering" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5">
+          <span>⚡</span>
+          <span>شاشة إدخال الطلبيات الرأسية</span>
+        </button>
+        <button id="btn-quick-pdf" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5">
+          <span>📄</span>
+          <span>معاينة وتصدير PDF</span>
+        </button>
+        <button id="btn-download-app" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5">
+          <span>⬇️</span>
+          <span>تحميل التطبيق كملف</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="bg-slate-800/90 border-t border-slate-700/80">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-1 overflow-x-auto py-1.5">
+        <button data-tab="ordering" class="nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition whitespace-nowrap bg-indigo-600 text-white shadow-sm flex items-center gap-1.5">
+          <span>🛒</span>
+          <span>إدخال الطلبيات (رأسي للفرع)</span>
+        </button>
+        <button data-tab="invoice-studio" class="nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap text-slate-300 hover:text-white hover:bg-slate-700/60 flex items-center gap-1.5">
+          <span>🖨️</span>
+          <span>الفواتير والواتساب (WhatsApp)</span>
+        </button>
+        <button data-tab="opex" class="nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap text-slate-300 hover:text-white hover:bg-slate-700/60 flex items-center gap-1.5">
+          <span>💸</span>
+          <span>المصروفات وتسليم العهد (OPEX)</span>
+        </button>
+        <button data-tab="dashboard" class="nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap text-slate-300 hover:text-white hover:bg-slate-700/60 flex items-center gap-1.5">
+          <span>📊</span>
+          <span>الملخص المالي (Dashboard)</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast Notification -->
+  <div id="toast-container" class="fixed bottom-5 left-5 z-50 hidden no-print">
+    <div id="toast-box" class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 flex items-center gap-3 text-sm font-semibold">
+      <span id="toast-icon">✅</span>
+      <span id="toast-msg">تم التحديث بنجاح</span>
+    </div>
+  </div>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+
+    <!-- ==================== TAB 1: VERTICAL ORDERING ==================== -->
+    <section id="tab-ordering" class="tab-panel space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <div class="max-w-2xl mx-auto space-y-4">
+          <div class="text-center pb-2 border-b border-slate-100">
+            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900">شاشة إدخال الطلبيات (رأسي لكل فرع)</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">اختر الفرع، أدخل الكميات لكل صنف (بدون تفاصيل العيش المعقدة)، وسجل رقم الواتساب لإرسال الفاتورة فور الاعتماد.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">الفرع / العميل الحالي</label>
+              <select id="vert-branch-select" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2 font-bold bg-slate-50 focus:outline-none focus:border-indigo-600">
+                <option value="kickN">فرع Kick N</option>
+                <option value="ichi">فرع ICHI</option>
+                <option value="kujiT">كوجي الترعة (KUJI Teraa)</option>
+                <option value="kujiG">كوجي جيهان (KUJI Gihan)</option>
+                <option value="arika">فرع أريكا (Arika)</option>
+                <option value="hpoint">فرع H.Point</option>
+                <option value="sense">فرع SENSE</option>
+                <option value="bsociety">فرع B' SOCIETY</option>
+                <option value="catering">كاترنج / Test</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">رقم موبايل الواتساب (لإرسال الفاتورة)</label>
+              <input type="text" id="vert-whatsapp-input" placeholder="مثال: 01012345678" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2 bg-slate-50 num-font font-bold focus:outline-none focus:border-indigo-600" />
+            </div>
+          </div>
+
+          <!-- Vertical Form List for Each Product -->
+          <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold text-slate-800">قائمة الأصناف (أدخل الكمية المطلوبة تحت بعضها):</span>
+              <span class="text-xs text-indigo-700 font-bold">السعر بالجنيه</span>
+            </div>
+
+            <div id="vertical-products-list" class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-2">
+            <div class="text-sm font-bold text-slate-700">
+              إجمالي قيمة طلبية الفرع: <span id="vert-total-val" class="text-emerald-700 font-extrabold text-lg num-font">0 ج.م</span>
+            </div>
+            <button id="btn-save-vert-order" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm px-6 py-3 rounded-xl shadow-md transition flex items-center gap-2">
+              <span>💾</span>
+              <span>حفظ طلبية هذا الفرع والانتقال للفرع التالي</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: INVOICE & WHATSAPP STUDIO ==================== -->
+    <section id="tab-invoice-studio" class="tab-panel hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 no-print">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900">مُولّد الفواتير وإرسال الواتساب الفوري</h2>
+            <p class="text-xs sm:text-sm text-slate-500">اختر الفرع، راجع الفاتورة المعتمدة من (جابر / محمد النجار / محمد أحمد)، واضغط إرسال عبر الواتساب برقم الموبايل المسجل.</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button id="btn-send-whatsapp" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2">
+              <span>📱</span>
+              <span>إرسال الفاتورة عبر الواتساب (WhatsApp)</span>
+            </button>
+            <button id="btn-download-pdf" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2">
+              <span>📥</span>
+              <span>تنزيل PDF</span>
+            </button>
+            <button id="btn-print-invoice" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2">
+              <span>🖨️</span>
+              <span>طباعة</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 pt-4 border-t border-slate-100">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">اختر الفرع للمعاينة</label>
+            <select id="inv-select-branch" class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 font-bold bg-slate-50 focus:outline-none focus:border-indigo-600">
+              <option value="kickN">Kick N</option>
+              <option value="ichi">ICHI</option>
+              <option value="kujiT">KUJI Teraa</option>
+              <option value="kujiG">KUJI Gihan</option>
+              <option value="arika">Arika</option>
+              <option value="hpoint">H.Point</option>
+              <option value="sense">SENSE</option>
+              <option value="bsociety">B' SOCIETY</option>
+              <option value="catering">كاترنج / Test</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">رقم الواتساب المسجل</label>
+            <input type="text" id="inv-whatsapp-display-input" placeholder="01012345678" class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 bg-slate-50 num-font font-bold" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">معتمد بواسطة الإدارة</label>
+            <select id="inv-approved-by" class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 font-bold bg-indigo-50 text-indigo-900">
+              <option value="أ/ جابر محمد">أ/ جابر محمد</option>
+              <option value="م/ محمد النجار">م/ محمد النجار</option>
+              <option value="محمد أحمد (مدير المطبخ)">محمد أحمد (مدير المطبخ)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Printable A4 Invoice Preview Card -->
+      <div id="invoice-print-wrapper" class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+        <div id="invoice-render-area" class="p-6 sm:p-10">
+          <div class="flex flex-wrap items-start justify-between gap-4 pb-6 border-b-2 border-slate-900">
+            <div class="flex items-center gap-3.5">
+              <div class="w-14 h-14 rounded-2xl bg-[#283618] text-[#e6eed8] border-2 border-[#648238] flex items-center justify-center text-xl font-extrabold num-font shadow-sm">
+                UP
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-extrabold uppercase tracking-widest px-2 py-0.5 rounded bg-[#e6eed8] text-[#283618] num-font">URBAN PREP</span>
+                  <span class="text-xs text-slate-500 font-bold">We prep. You serve</span>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-extrabold text-[#1f2b0f] mt-0.5">فاتورة توريد فرع</h2>
+                <div class="mt-1 inline-flex items-center gap-2 text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-md border border-indigo-200">
+                  <span id="inv-display-code">CLIENT CODE: KICK-01</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-left sm:text-right bg-slate-50 p-3.5 rounded-xl border border-slate-200 min-w-[230px]">
+              <div class="flex justify-between gap-4 text-xs text-slate-500 mb-1">
+                <span>اسم الفرع:</span>
+                <span id="inv-display-client" class="font-extrabold text-indigo-700 text-sm">Kick N</span>
+              </div>
+              <div class="flex justify-between gap-4 text-xs text-slate-500 mb-1">
+                <span>رقم الواتس:</span>
+                <span id="inv-display-whatsapp" class="font-bold text-slate-800 num-font">01000000000</span>
+              </div>
+              <div class="flex justify-between gap-4 text-xs text-slate-500">
+                <span>معتمد بواسطة:</span>
+                <span id="inv-display-approver" class="font-bold text-emerald-700">أ/ جابر محمد</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 overflow-x-auto">
+            <table class="w-full text-right border-collapse">
+              <thead>
+                <tr class="bg-slate-900 text-white text-xs sm:text-sm">
+                  <th class="py-2.5 px-3 border border-slate-800 w-12 text-center">#</th>
+                  <th class="py-2.5 px-3 border border-slate-800">الصنف (بدون تفاصيل العيش)</th>
+                  <th class="py-2.5 px-3 border border-slate-800 text-center w-28">الكمية</th>
+                  <th class="py-2.5 px-3 border border-slate-800 text-center w-28">سعر الوحدة</th>
+                  <th class="py-2.5 px-3 border border-slate-800 text-center w-32">الإجمالي</th>
+                </tr>
+              </thead>
+              <tbody id="invoice-items-tbody" class="divide-y divide-slate-200 text-xs sm:text-sm">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-6 flex justify-end">
+            <div class="bg-slate-900 text-white rounded-2xl p-5 w-full sm:w-80 space-y-2">
+              <div class="flex justify-between items-center text-xs text-slate-300">
+                <span>إجمالي قطع الساندوتشات:</span>
+                <span id="inv-total-qty" class="font-extrabold text-white num-font">0 قطعة</span>
+              </div>
+              <div class="border-t border-slate-700 pt-2 flex justify-between items-center">
+                <span class="text-sm font-extrabold text-amber-400">صافي الفاتورة:</span>
+                <span id="inv-net-total" class="text-xl font-extrabold text-amber-400 num-font">0 ج.م</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: OPEX & CUSTODY TRANSFERS ==================== -->
+    <section id="tab-opex" class="tab-panel hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-5">
+        <div>
+          <h2 class="text-lg font-extrabold text-slate-900">سجل المصروفات وتسليم العهد بين الأفراد</h2>
+          <p class="text-xs text-slate-500">تسجيل العهد النقدية المسلمة بين الأفراد (النجار، جابر، محمد أحمد) لتخصم تلقائياً من الفواتير والمسحوبات.</p>
+        </div>
+
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
+          <div class="lg:col-span-2">
+            <label class="block text-xs font-bold text-slate-600 mb-1">البيان / تفاصيل العهدة أو المصروف</label>
+            <input type="text" id="custody-desc" placeholder="مثال: تسليم عهدة نقدية أو ثمن خامات" class="w-full text-xs border border-slate-300 rounded-xl px-3 py-2 bg-white" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">المبلغ (ج.م)</label>
+            <input type="number" id="custody-amount" min="0" placeholder="0" class="w-full text-xs border border-slate-300 rounded-xl px-3 py-2 bg-white num-font font-bold" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">المسلم (من)</label>
+            <select id="custody-giver" class="w-full text-xs border border-slate-300 rounded-xl px-3 py-2 bg-white font-bold">
+              <option value="النجار">النجار</option>
+              <option value="جابر">جابر</option>
+              <option value="محمد أحمد">محمد أحمد</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">المستلم (إلى)</label>
+            <select id="custody-receiver" class="w-full text-xs border border-slate-300 rounded-xl px-3 py-2 bg-white font-bold">
+              <option value="محمد أحمد">محمد أحمد</option>
+              <option value="النجار">النجار</option>
+              <option value="جابر">جابر</option>
+            </select>
+          </div>
+
+          <div>
+            <button id="btn-add-custody" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl transition">
+              + تسجيل العهدة
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+          <table class="w-full text-right border-collapse text-xs">
+            <thead class="bg-slate-900 text-white">
+              <tr>
+                <th class="py-2.5 px-3">التاريخ</th>
+                <th class="py-2.5 px-3">البيان</th>
+                <th class="py-2.5 px-3 text-center">المبلغ</th>
+                <th class="py-2.5 px-3">المسلم (من)</th>
+                <th class="py-2.5 px-3">المستلم (إلى)</th>
+              </tr>
+            </thead>
+            <tbody id="custody-table-body" class="divide-y divide-slate-200">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: DASHBOARD ==================== -->
+    <section id="tab-dashboard" class="tab-panel hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <h2 class="text-lg font-extrabold text-slate-900 mb-3">الملخص المالي العام</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-indigo-600 text-white rounded-xl p-4">
+            <div class="text-xs text-indigo-100 font-bold">إجمالي المبيعات</div>
+            <div id="dash-sales" class="text-2xl font-extrabold mt-1 num-font">0 ج.م</div>
+          </div>
+          <div class="bg-rose-600 text-white rounded-xl p-4">
+            <div class="text-xs text-rose-100 font-bold">إجمالي المصروفات والعهد</div>
+            <div id="dash-opex" class="text-2xl font-extrabold mt-1 num-font">0 ج.م</div>
+          </div>
+          <div class="bg-emerald-600 text-white rounded-xl p-4">
+            <div class="text-xs text-emerald-100 font-bold">صافي الربح</div>
+            <div id="dash-profit" class="text-2xl font-extrabold mt-1 num-font">0 ج.م</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const PRODUCTS = [
+      { id: 1, name: "ساندوتش تركي", price: 85 },
+      { id: 2, name: "ساندوتش روست بيف", price: 90 },
+      { id: 3, name: "سيراتشا روست بيف", price: 100 },
+      { id: 4, name: "ميكس كولد كاتس", price: 100 },
+      { id: 5, name: "تاندوري تشيكن", price: 95 },
+      { id: 6, name: "رانش تشيكن", price: 95 },
+      { id: 7, name: "باربيكيو تشيكن", price: 95 },
+      { id: 8, name: "حلومي فوكاشيا", price: 90 },
+      { id: 9, name: "سلمون مدخن بيجل", price: 140 },
+      { id: 10, name: "تونة باجيت", price: 110 },
+      { id: 11, name: "كلوب ساندوتش", price: 90 },
+      { id: 12, name: "سيزر سالاد", price: 100 }
+    ];
+
+    let orderingState = {
+      kickN: {}, ichi: {}, kujiT: {}, kujiG: {}, arika: {}, hpoint: {}, sense: {}, bsociety: {}, catering: {}
+    };
+    let branchWhatsApp = {};
+    let custodyList = [];
+
+    function renderVerticalProductsList() {
+      const container = document.getElementById("vertical-products-list");
+      const branchKey = document.getElementById("vert-branch-select").value;
+      const currentBranchData = orderingState[branchKey] || {};
+
+      document.getElementById("vert-whatsapp-input").value = branchWhatsApp[branchKey] || "";
+
+      let html = "";
+      let branchTotal = 0;
+
+      PRODUCTS.forEach(prod => {
+        const qty = currentBranchData[prod.id] || 0;
+        branchTotal += qty * prod.price;
+        html += `
+          <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-slate-200">
+            <div>
+              <div class="font-extrabold text-slate-900 text-xs sm:text-sm">${prod.name}</div>
+              <div class="text-[11px] text-slate-500 num-font">${prod.price} ج.م للقطعة</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <input
+                type="number"
+                min="0"
+                step="1"
+                data-prod-id="${prod.id}"
+                value="${qty > 0 ? qty : ''}"
+                placeholder="0"
+                class="order-input w-20 text-center py-1.5 px-2 rounded-lg border border-slate-300 text-sm num-font font-bold"
+              />
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      document.getElementById("vert-total-val").textContent = `${branchTotal.toLocaleString()} ج.م`;
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-panel").forEach(sec => sec.classList.add("hidden"));
+      const target = document.getElementById(`tab-${tabId}`);
+      if (target) target.classList.remove("hidden");
+
+      document.querySelectorAll(".nav-tab").forEach(btn => {
+        if (btn.getAttribute("data-tab") === tabId) {
+          btn.className = "nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition whitespace-nowrap bg-indigo-600 text-white shadow-sm flex items-center gap-1.5";
+        } else {
+          btn.className = "nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap text-slate-300 hover:text-white hover:bg-slate-700/60 flex items-center gap-1.5";
+        }
+      });
+
+      if (tabId === "invoice-studio") {
+        renderInvoicePreview();
+      } else if (tabId === "opex") {
+        renderCustodyTable();
+      } else if (tabId === "dashboard") {
+        updateDashboard();
+      }
+    }
+
+    function renderInvoicePreview() {
+      const branchKey = document.getElementById("inv-select-branch").value;
+      const phone = branchWhatsApp[branchKey] || "غير مسجل";
+      document.getElementById("inv-whatsapp-display-input").value = phone;
+      document.getElementById("inv-display-whatsapp").textContent = phone;
+      document.getElementById("inv-display-client").textContent = branchKey.toUpperCase();
+      document.getElementById("inv-display-approver").textContent = document.getElementById("inv-approved-by").value;
+
+      const itemsData = orderingState[branchKey] || {};
+      const tbody = document.getElementById("invoice-items-tbody");
+      let rowsHtml = "";
+      let totalQty = 0;
+      let totalVal = 0;
+
+      PRODUCTS.forEach(prod => {
+        const q = itemsData[prod.id] || 0;
+        if (q > 0) {
+          const lineVal = q * prod.price;
+          totalQty += q;
+          totalVal += lineVal;
+          rowsHtml += `
+            <tr>
+              <td class="py-2.5 px-3 border border-slate-200 text-center num-font">${prod.id}</td>
+              <td class="py-2.5 px-3 border border-slate-200 font-extrabold text-slate-900">${prod.name}</td>
+              <td class="py-2.5 px-3 border border-slate-200 text-center num-font font-bold text-indigo-700">${q}</td>
+              <td class="py-2.5 px-3 border border-slate-200 text-center num-font">${prod.price} ج.م</td>
+              <td class="py-2.5 px-3 border border-slate-200 text-center num-font font-extrabold">${lineVal.toLocaleString()} ج.م</td>
+            </tr>
+          `;
+        }
+      });
+
+      if (!rowsHtml) {
+        rowsHtml = `<tr><td colspan="5" class="py-6 text-center text-slate-400 font-bold">لا توجد طلبات مدخلة لهذا الفرع حالياً</td></tr>`;
+      }
+      tbody.innerHTML = rowsHtml;
+      document.getElementById("inv-total-qty").textContent = `${totalQty} قطعة`;
+      document.getElementById("inv-net-total").textContent = `${totalVal.toLocaleString()} ج.م`;
+    }
+
+    function sendWhatsAppInvoice() {
+      const branchKey = document.getElementById("inv-select-branch").value;
+      const phone = branchWhatsApp[branchKey];
+      if (!phone) {
+        alert("يرجى إدخال رقم واتساب صالح لهذا الفرع أولاً من شاشة الطلبيات!");
+        return;
+      }
+
+      const approver = document.getElementById("inv-approved-by").value;
+      const itemsData = orderingState[branchKey] || {};
+      let text = `مرحباً بك من Urban Prep 🌿\nفاتورة توريد فرع: *${branchKey.toUpperCase()}*\n--------------------\n`;
+      let total = 0;
+
+      PRODUCTS.forEach(prod => {
+        const q = itemsData[prod.id] || 0;
+        if (q > 0) {
+          const line = q * prod.price;
+          total += line;
+          text += `- ${prod.name}: (${q} قطعة) = ${line} ج.م\n`;
+        }
+      });
+
+      text += `--------------------\n*الإجمالي: ${total} ج.م*\nمعتمدة بواسطة: ${approver} ✅`;
+      const encoded = encodeURIComponent(text);
+      window.open(`https://wa.me/${phone}?text=${encoded}`, '_blank');
+    }
+
+    function renderCustodyTable() {
+      const tbody = document.getElementById("custody-table-body");
+      tbody.innerHTML = custodyList.map(c => `
+        <tr>
+          <td class="py-2 px-3 num-font">${c.date}</td>
+          <td class="py-2 px-3 font-bold">${c.desc}</td>
+          <td class="py-2 px-3 text-center num-font font-extrabold text-rose-600">${c.amount} ج.م</td>
+          <td class="py-2 px-3 font-bold text-slate-700">${c.giver}</td>
+          <td class="py-2 px-3 font-bold text-slate-700">${c.receiver}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="5" class="py-4 text-center text-slate-400">لا توجد عهد مسجلة بعد</td></tr>`;
+    }
+
+    function updateDashboard() {
+      let sales = 0;
+      Object.keys(orderingState).forEach(b => {
+        const items = orderingState[b];
+        PRODUCTS.forEach(p => { sales += (items[p.id] || 0) * p.price; });
+      });
+      let opex = custodyList.reduce((acc, x) => acc + x.amount, 0);
+      document.getElementById("dash-sales").textContent = `${sales.toLocaleString()} ج.م`;
+      document.getElementById("dash-opex").textContent = `${opex.toLocaleString()} ج.م`;
+      document.getElementById("dash-profit").textContent = `${(sales - opex).toLocaleString()} ج.م`;
+    }
+
+    function showToast(msg) {
+      const c = document.getElementById("toast-container");
+      document.getElementById("toast-msg").textContent = msg;
+      c.classList.remove("hidden");
+      setTimeout(() => c.classList.add("hidden"), 3000);
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderVerticalProductsList();
+
+      document.querySelectorAll(".nav-tab").forEach(btn => {
+        btn.addEventListener("click", () => switchTab(btn.getAttribute("data-tab")));
+      });
+
+      document.getElementById("vert-branch-select").addEventListener("change", renderVerticalProductsList);
+
+      document.getElementById("vertical-products-list").addEventListener("input", (e) => {
+        const inp = e.target.closest("input");
+        if (!inp) return;
+        const branchKey = document.getElementById("vert-branch-select").value;
+        const prodId = inp.getAttribute("data-prod-id");
+        if (!orderingState[branchKey]) orderingState[branchKey] = {};
+        orderingState[branchKey][prodId] = Math.max(0, parseFloat(inp.value) || 0);
+
+        let branchTotal = 0;
+        PRODUCTS.forEach(p => { branchTotal += (orderingState[branchKey][p.id] || 0) * p.price; });
+        document.getElementById("vert-total-val").textContent = `${branchTotal.toLocaleString()} ج.م`;
+      });
+
+      document.getElementById("btn-save-vert-order").addEventListener("click", () => {
+        const branchKey = document.getElementById("vert-branch-select").value;
+        const phone = document.getElementById("vert-whatsapp-input").value.trim();
+        branchWhatsApp[branchKey] = phone;
+        showToast(`✅ تم حفظ طلبية فرع ${branchKey.toUpperCase()} بنجاح برقم الواتس: ${phone || 'بدون رقم'}`);
+      });
+
+      document.getElementById("btn-send-whatsapp").addEventListener("click", sendWhatsAppInvoice);
+
+      document.getElementById("inv-select-branch").addEventListener("change", renderInvoicePreview);
+      document.getElementById("inv-approved-by").addEventListener("change", () => {
+        document.getElementById("inv-display-approver").textContent = document.getElementById("inv-approved-by").value;
+      });
+
+      document.getElementById("btn-add-custody").addEventListener("click", () => {
+        const desc = document.getElementById("custody-desc").value.trim();
+        const amount = parseFloat(document.getElementById("custody-amount").value) || 0;
+        const giver = document.getElementById("custody-giver").value;
+        const receiver = document.getElementById("custody-receiver").value;
+
+        if (!desc || amount <= 0) {
+          alert("يرجى إدخال البيان والمبلغ بشكل صحيح");
+          return;
+        }
+
+        custodyList.push({
+          date: new Date().toLocaleDateString("ar-EG"),
+          desc, amount, giver, receiver
+        });
+
+        document.getElementById("custody-desc").value = "";
+        document.getElementById("custody-amount").value = "";
+        renderCustodyTable();
+        showToast("✅ تم تسجيل العهدة بنجاح وخصمها من الحسابات");
+      });
+
+      document.getElementById("btn-download-app").addEventListener("click", () => {
+        const fullHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+        const blob = new Blob([fullHtml], { type: "text/html;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Urban_Prep_App.html";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast("✅ تم تحميل التطبيق بصيغة HTML جاهز للتشغيل على أي جهاز!");
+      });
+    });
+  </script>
+</body>
+</html>

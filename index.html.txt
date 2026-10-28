@@ -1,860 +1,642 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Urban Prep</title>
-    <meta name="theme-color" content="#0F352E">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Urban Prep">
-    <link id="favicon" rel="icon" type="image/png" href="">
-    <link id="apple-icon" rel="apple-touch-icon" href="">
-    <link id="manifest-link" rel="manifest" href="">
-
-    <style>
-        :root {
-            --brand-bg: #0F352E;
-            --brand-dark: #081F1B;
-            --brand-accent: #D4AF37;
-            --light-bg: #F4F6F5;
-            --white: #FFFFFF;
-            --danger: #C0392B;
-            --success: #27AE60;
-            --text-dark: #1C2826;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Urban Prep | نظام إدارة الطلبيات والفواتير والحسابات المالية</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            indigo: {
+              50: '#f4f7ee', 100: '#e6eed8', 200: '#cde0b4', 300: '#adc988', 400: '#89ae5c',
+              500: '#648238', 600: '#4b6326', 700: '#3b4e1d', 800: '#2f3e18', 900: '#253113', 950: '#18210b'
+            },
+            olive: {
+              50: '#f4f7ee', 100: '#e6eed8', 200: '#cde0b4', 300: '#adc988', 400: '#89ae5c',
+              500: '#648238', 600: '#4b6326', 700: '#3b4e1d', 800: '#2b3a15', 900: '#1f2b0f', 950: '#141c09'
+            }
+          }
         }
-
-        * { box-sizing: border-box; }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--light-bg);
-            color: var(--text-dark);
-        }
-
-        #loginScreen {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(145deg, var(--brand-bg), var(--brand-dark));
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            padding: 20px;
-        }
-
-        .login-box {
-            background: var(--white);
-            padding: 30px 25px;
-            border-radius: 14px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-            text-align: center;
-            border-top: 5px solid var(--brand-accent);
-        }
-
-        .brand-logo-box {
-            background-color: var(--brand-bg);
-            color: var(--white);
-            padding: 22px 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: left;
-            direction: ltr;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.3);
-        }
-
-        .brand-logo-box h1 {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            font-size: 2.3rem;
-            margin: 0;
-            font-weight: normal;
-        }
-
-        .brand-logo-box p {
-            margin: 6px 0 0;
-            font-size: 0.9rem;
-            opacity: 0.9;
-            font-family: sans-serif;
-        }
-
-        header {
-            background-color: var(--brand-bg);
-            color: var(--white);
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border-bottom: 3px solid var(--brand-accent);
-        }
-
-        .header-brand {
-            direction: ltr;
-            text-align: left;
-        }
-
-        .header-brand h1 {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            margin: 0;
-            font-size: 1.9rem;
-            font-weight: normal;
-        }
-
-        .header-brand p {
-            margin: 2px 0 0;
-            font-size: 0.8rem;
-            opacity: 0.85;
-        }
-
-        .user-info-bar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .user-badge {
-            background: rgba(255,255,255,0.12);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            border: 1px solid var(--brand-accent);
-        }
-
-        .btn-logout, .btn-install {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.85rem;
-        }
-
-        .btn-install {
-            background: var(--brand-accent);
-            color: var(--brand-dark);
-            display: none;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 0 15px;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .tab-btn {
-            background-color: var(--brand-dark);
-            color: var(--white);
-            padding: 11px 18px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            transition: 0.2s;
-        }
-
-        .tab-btn.active {
-            background-color: var(--brand-accent);
-            color: var(--brand-dark);
-            font-weight: bold;
-        }
-
-        .section {
-            background: var(--white);
-            padding: 22px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            display: none;
-        }
-
-        .section.active { display: block; }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .card {
-            background: var(--brand-bg);
-            color: var(--white);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            border-bottom: 4px solid var(--brand-accent);
-        }
-
-        .card h3 {
-            margin: 0;
-            color: var(--brand-accent);
-            font-size: 0.95rem;
-        }
-
-        .card p {
-            font-size: 1.6rem;
-            margin: 10px 0 0;
-            font-weight: bold;
-        }
-
-        /* تنسيق نموذج إدخال الطلبيات بشكل رأسي متسلسل */
-        .order-form-vertical {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-width: 600px;
-            margin: 0 auto 20px auto;
-            background: #fdfdfd;
-            padding: 20px;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-        }
-
-        .form-group { text-align: right; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
-        input, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 0.95rem;
-        }
-
-        .action-btn {
-            background-color: var(--brand-bg);
-            color: var(--white);
-            padding: 12px 20px;
-            border: 1px solid var(--brand-accent);
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            font-size: 1rem;
-        }
-
-        .action-btn:hover { background-color: var(--brand-dark); }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th, td {
-            padding: 11px;
-            border: 1px solid #e0e0e0;
-            text-align: center;
-            font-size: 0.92rem;
-        }
-
-        th {
-            background-color: var(--brand-bg);
-            color: var(--white);
-        }
-
-        tr:nth-child(even) { background-color: #f8faf9; }
-
-        .status-paid { color: var(--success); font-weight: bold; }
-        .status-unpaid { color: var(--danger); font-weight: bold; }
-
-        .delete-btn {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .whatsapp-btn {
-            background: #25D366;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .hidden { display: none !important; }
-
-        @media print {
-            header, .tabs, .no-print, #loginScreen { display: none !important; }
-            .section { box-shadow: none; }
-        }
-    </style>
+      }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    * { font-family: 'Cairo', 'Inter', sans-serif; box-sizing: border-box; }
+    body { background-color: #f6f8f3; color: #1a2412; overflow-x: hidden; }
+    .num-font { font-family: 'Inter', 'Cairo', sans-serif; }
+    header.bg-slate-900, .bg-slate-900 { background-color: #243015 !important; }
+    .bg-slate-800\/90, .bg-slate-800 { background-color: #2f3e1b !important; }
+    .border-slate-700\/80, .border-slate-700, .border-slate-800 { border-color: #3f5225 !important; }
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #eef2e6; }
+    ::-webkit-scrollbar-thumb { background: #9db37c; border-radius: 9999px; }
+    .order-input:focus { outline: none; border-color: #4b6326; box-shadow: 0 0 0 3px rgba(75, 99, 38, 0.22); background-color: #f4f7ee; }
+    .order-input.has-val { background-color: #e6eed8; border-color: #4b6326; color: #1f2b0f; font-weight: 800; }
+    #invoice-render-area { background: #ffffff; color: #0f172a; }
+    @media print {
+      body * { visibility: hidden; }
+      #invoice-print-wrapper, #invoice-print-wrapper * { visibility: visible; }
+      #invoice-print-wrapper { position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; box-shadow: none !important; }
+      .no-print { display: none !important; }
+    }
+  </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900">
 
-    <div id="loginScreen">
-        <div class="login-box">
-            <div class="brand-logo-box">
-                <h1>Urban Prep</h1>
-                <p>We prep. You serve</p>
-            </div>
-            <h3 style="margin-top:0;">تسجيل الدخول للنظام</h3>
-            <div class="form-group">
-                <label>اسم المستخدم (Username):</label>
-                <input type="text" id="loginUser" placeholder="مثال: gaber أو naggar أو mohamed">
-            </div>
-            <div class="form-group" style="margin-top:10px;">
-                <label>كلمة المرور (Password):</label>
-                <input type="password" id="loginPass" placeholder="••••">
-            </div>
-            <button class="action-btn" style="margin-top:15px;" onclick="handleLogin()">دخول</button>
-            <p id="loginError" style="color:var(--danger); font-size:0.85rem; margin-top:10px; display:none;">اسم المستخدم أو كلمة المرور غير صحيحة!</p>
+  <!-- Top Header -->
+  <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-30 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#648238] to-[#3b4e1d] border border-[#adc988]/40 flex items-center justify-center text-white font-extrabold text-lg shadow-md tracking-wider num-font">
+          UP
         </div>
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-wide text-white num-font">URBAN PREP</h1>
+            <span class="bg-[#648238]/30 border border-[#adc988]/40 text-[#e6eed8] text-xs px-2.5 py-0.5 rounded-full font-bold">Royal Olive Edition</span>
+          </div>
+          <p class="text-xs text-[#cde0b4]">We prep. You serve • نظام إدارة الطلبيات والعهد والواتساب</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2.5">
+        <button id="btn-go-ordering" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5">
+          <span>⚡</span>
+          <span>شاشة إدخال الطلبيات الرأسية</span>
+        </button>
+        <button id="btn-quick-pdf" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5">
+          <span>📄</span>
+          <span>معاينة وتصدير PDF</span>
+        </button>
+        <button id="btn-download-app" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5">
+          <span>⬇️</span>
+          <span>تحميل التطبيق كملف</span>
+        </button>
+      </div>
     </div>
 
-    <header>
-        <div class="header-brand">
-            <h1>Urban Prep</h1>
-            <p>We prep. You serve</p>
-        </div>
-        <div class="user-info-bar">
-            <button id="installAppBtn" class="btn-install" onclick="installPWA()">📲 تثبيت التطبيق</button>
-            <span id="currentUserBadge" class="user-badge"></span>
-            <button class="btn-logout" onclick="handleLogout()">تسجيل خروج</button>
-        </div>
-    </header>
-
-    <div class="container">
-        <div class="tabs">
-            <button id="tabDashboard" class="tab-btn" onclick="switchTab('dashboard', this)">📊 الأرباح والمبيعات</button>
-            <button id="tabOrders" class="tab-btn" onclick="switchTab('orders', this)">🥪 الطلبيات والتشغيل</button>
-            <button id="tabOpex" class="tab-btn" onclick="switchTab('opex', this)">💸 المصروفات والعهد</button>
-            <button id="tabClients" class="tab-btn" onclick="switchTab('clients', this)">🧾 حسابات وفواتير العملاء</button>
-            <button id="tabUsers" class="tab-btn" onclick="switchTab('users', this)">🔐 الصلاحيات والمستخدمين</button>
-        </div>
-
-        <!-- 1. الأرباح -->
-        <div id="dashboard" class="section">
-            <h2>الملخص المالي والأرباح (خاص بالإدارة)</h2>
-            <div class="dashboard-grid">
-                <div class="card"><h3>إجمالي المبيعات</h3><p id="dashSales">0 ج.م</p></div>
-                <div class="card"><h3>إجمالي المصروفات والعهد</h3><p id="dashOpex">0 ج.م</p></div>
-                <div class="card"><h3>صافي الربح</h3><p id="dashProfit">0 ج.م</p></div>
-                <div class="card"><h3>نصيب م/ محمد النجار</h3><p id="dashNaggar">0 ج.م</p></div>
-                <div class="card"><h3>نصيب أ/ جابر محمد</h3><p id="dashGaber">0 ج.م</p></div>
-            </div>
-        </div>
-
-        <!-- 2. الطلبيات (شكل رأسي متسلسل للفرع الواحد) -->
-        <div id="orders" class="section">
-            <div class="no-print">
-                <h2>تسجيل طلبية للفرع / العميل</h2>
-                <div class="order-form-vertical">
-                    <div class="form-group">
-                        <label>التاريخ:</label>
-                        <input type="date" id="orderDate">
-                    </div>
-                    <div class="form-group">
-                        <label>الفرع / العميل:</label>
-                        <select id="clientSelect">
-                            <option value="فرع رمادا">فرع رمادا</option>
-                            <option value="فرع مارشال">فرع مارشال</option>
-                            <option value="فرع طنطا">فرع طنطا</option>
-                            <option value="فرع التجمع الخامس">فرع التجمع الخامس</option>
-                            <option value="Kick N">Kick N</option>
-                            <option value="Kuji T.">Kuji T. (الترعة)</option>
-                            <option value="Kuji G.">Kuji G. (جيهان)</option>
-                            <option value="Arika">Arika</option>
-                            <option value="Uncle Zack">Uncle Zack</option>
-                            <option value="Ichi">Ichi</option>
-                            <option value="Sense">Sense</option>
-                            <option value="Curio">Curio</option>
-                            <option value="5 Slash">5 Slash</option>
-                            <option value="كاترنج">كاترنج</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>الصنف (بدون تفاصيل الخبز):</label>
-                        <select id="productSelect" onchange="syncProductPrice()">
-                            <option value="ساندوتش تركي" data-price="85">ساندوتش تركي</option>
-                            <option value="ساندوتش روست بيف" data-price="90">ساندوتش روست بيف</option>
-                            <option value="سيراتشا روست بيف" data-price="100">سيراتشا روست بيف</option>
-                            <option value="ميكس كولد كتس" data-price="100">ميكس كولد كتس</option>
-                            <option value="تاندوري تشيكن" data-price="95">تاندوري تشيكن</option>
-                            <option value="رانش تشيكن" data-price="95">رانش تشيكن</option>
-                            <option value="باربيكيو تشيكن" data-price="95">باربيكيو تشيكن</option>
-                            <option value="حلومي فوكاشيا" data-price="90">حلومي فوكاشيا</option>
-                            <option value="سموك سالمون بيجل" data-price="140">سموك سالمون بيجل</option>
-                            <option value="تونة ساندوتش" data-price="110">تونة ساندوتش</option>
-                            <option value="كلوب ساندوتش" data-price="90">كلوب ساندوتش</option>
-                            <option value="سيزر سالاد" data-price="100">سيزر سالاد</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>الكمية:</label>
-                        <input type="number" id="qtyInput" min="1" value="1" oninput="calcOrderTotal()">
-                    </div>
-                    <div class="form-group sales-Perm-field">
-                        <label>سعر الوحدة:</label>
-                        <input type="number" id="unitPriceInput" value="85" oninput="calcOrderTotal()">
-                    </div>
-                    <div class="form-group sales-Perm-field">
-                        <label>الإجمالي:</label>
-                        <input type="number" id="priceInput" value="85" readonly>
-                    </div>
-                    <div class="form-group sales-Perm-field">
-                        <label>حالة الدفع:</label>
-                        <select id="paymentStatus">
-                            <option value="مدفوع">مدفوع</option>
-                            <option value="غير مدفوع">غير مدفوع</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>رقم هاتف الواتساب (لإرسال الفاتورة):</label>
-                        <input type="text" id="whatsappPhone" placeholder="مثال: 01012345678">
-                    </div>
-                    <button class="action-btn" onclick="addOrder()">+ حفظ وإضافة صنف آخر للفرع</button>
-                </div>
-            </div>
-            <h2>سجل الطلبيات</h2>
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>التاريخ</th>
-                            <th>الفرع / العميل</th>
-                            <th>الصنف</th>
-                            <th>العدد</th>
-                            <th class="sales-Perm-col">الإجمالي</th>
-                            <th class="sales-Perm-col">الحالة</th>
-                            <th>رقم الواتس</th>
-                            <th>بواسطة</th>
-                            <th class="delete-Perm-col">حذف</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ordersTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 3. المصروفات والعهد (بين الأفراد والخصم من الفواتير) -->
-        <div id="opex" class="section">
-            <h2>تسجيل المصروفات وتسليم العهد بين الأفراد</h2>
-            <div class="order-form-vertical">
-                <div class="form-group"><label>التاريخ:</label><input type="date" id="opexDate"></div>
-                <div class="form-group">
-                    <label>نوع الحركة:</label>
-                    <select id="opexType" onchange="toggleOpexFields()">
-                        <option value="مصروف تشغيلي">مصروف تشغيلي (خامات / مشتريات)</option>
-                        <option value="تسليم عهدة">تسليم وتسلم عهدة بين فردين (تخصم من الفواتير)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>المسلم (من):</label>
-                    <select id="giverSelect">
-                        <option value="جابر">جابر</option>
-                        <option value="النجار">النجار</option>
-                        <option value="محمد أحمد">محمد أحمد</option>
-                    </select>
-                </div>
-                <div class="form-group" id="receiverGroup" style="display:none;">
-                    <label>المستلم (إلى):</label>
-                    <select id="receiverSelect">
-                        <option value="محمد أحمد">محمد أحمد</option>
-                        <option value="جابر">جابر</option>
-                        <option value="النجار">النجار</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>البيان / التفاصيل:</label>
-                    <input type="text" id="descInput" placeholder="مثال: تسليم عهدة نقدية أو ثمن خامات">
-                </div>
-                <div class="form-group">
-                    <label>المبلغ (ج.م):</label>
-                    <input type="number" id="amountInput" min="0">
-                </div>
-                <button class="action-btn" onclick="addOpex()">+ حفظ وتحديث العهدة</button>
-            </div>
-
-            <h2>سجل العهد والمصروفات</h2>
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>التاريخ</th>
-                            <th>النوع</th>
-                            <th>من (المسلم)</th>
-                            <th>إلى (المستلم)</th>
-                            <th>البيان</th>
-                            <th>المبلغ</th>
-                            <th>بواسطة</th>
-                            <th class="delete-Perm-col">حذف</th>
-                        </tr>
-                    </thead>
-                    <tbody id="opexTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 4. حسابات العملاء وربط الواتس -->
-        <div id="clients" class="section">
-            <h2>حسابات الفروع والعملاء وإرسال الفواتير واتساب</h2>
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>الفرع / العميل</th>
-                            <th>إجمالي القطع</th>
-                            <th>المسحوبات</th>
-                            <th>المدفوع</th>
-                            <th>المتبقي</th>
-                            <th>واتساب الفاتورة</th>
-                        </tr>
-                    </thead>
-                    <tbody id="clientsTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 5. المستخدمين -->
-        <div id="users" class="section">
-            <h2>إدارة الصلاحيات (جابر والنجار فقط)</h2>
-            <div class="order-form-vertical">
-                <div class="form-group"><label>الاسم:</label><input type="text" id="newUserName" placeholder="اسم المستخدم"></div>
-                <div class="form-group"><label>Username:</label><input type="text" id="newUserLogin" placeholder="اسم الدخول"></div>
-                <div class="form-group"><label>Password:</label><input type="text" id="newUserPass" placeholder="كلمة المرور"></div>
-                <div class="form-group">
-                    <label>الدور:</label>
-                    <select id="newUserRole">
-                        <option value="مدير مطبخ">مدير مطبخ</option>
-                        <option value="مشرف">مشرف</option>
-                        <option value="الإدارة">الإدارة</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>رؤية المبيعات والأرباح؟</label>
-                    <select id="permSales"><option value="no">مغلق</option><option value="yes">مسموح</option></select>
-                </div>
-                <div class="form-group">
-                    <label>المصروفات والعهد؟</label>
-                    <select id="permOpex"><option value="yes">مسموح</option><option value="no">مغلق</option></select>
-                </div>
-                <div class="form-group">
-                    <label>صلاحية الإدارة والحذف؟</label>
-                    <select id="permAdmin"><option value="no">مغلق</option><option value="yes">مسموح</option></select>
-                </div>
-                <button class="action-btn" onclick="saveNewUser()">+ حفظ صلاحيات المستخدم</button>
-            </div>
-            <h2>المستخدمون الحاليون</h2>
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>الاسم</th>
-                            <th>Username</th>
-                            <th>Password</th>
-                            <th>الدور</th>
-                            <th>الأرباح</th>
-                            <th>المصروفات</th>
-                            <th>إدارة</th>
-                            <th>إجراء</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersTableBody"></tbody>
-                </table>
-            </div>
-        </div>
+    <!-- Navigation Tabs -->
+    <div class="bg-slate-800/90 border-t border-slate-700/80">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-1 overflow-x-auto py-1.5">
+        <button data-tab="ordering" class="nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition whitespace-nowrap bg-indigo-600 text-white shadow-sm flex items-center gap-1.5">
+          <span>🛒</span>
+          <span>إدخال الطلبيات (رأسي للفرع)</span>
+        </button>
+        <button data-tab="invoice-studio" class="nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap text-slate-300 hover:text-white hover:bg-slate-700/60 flex items-center gap-1.5">
+          <span>🖨️</span>
+          <span>الفواتير والواتساب (WhatsApp)</span>
+        </button>
+        <button data-tab="opex" class="nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap text-slate-300 hover:text-white hover:bg-slate-700/60 flex items-center gap-1.5">
+          <span>💸</span>
+          <span>المصروفات وتسليم العهد (OPEX)</span>
+        </button>
+        <button data-tab="dashboard" class="nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap text-slate-300 hover:text-white hover:bg-slate-700/60 flex items-center gap-1.5">
+          <span>📊</span>
+          <span>الملخص المالي (Dashboard)</span>
+        </button>
+      </div>
     </div>
+  </header>
 
-    <script>
-        function setupAppIconAndPWA() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 512; canvas.height = 512;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#0F352E'; ctx.fillRect(0, 0, 512, 512);
-            ctx.strokeStyle = '#D4AF37'; ctx.lineWidth = 8; ctx.strokeRect(16, 16, 480, 480);
-            ctx.fillStyle = '#FFFFFF'; ctx.font = 'normal 88px Georgia, serif'; ctx.textAlign = 'center';
-            ctx.fillText('Urban Prep', 256, 245);
-            ctx.font = 'normal 32px Arial, sans-serif'; ctx.fillStyle = '#E0E7E5';
-            ctx.fillText('We prep. You serve', 256, 315);
-            const iconDataUrl = canvas.toDataURL('image/png');
-            document.getElementById('favicon').href = iconDataUrl;
-            document.getElementById('apple-icon').href = iconDataUrl;
+  <!-- Toast Notification -->
+  <div id="toast-container" class="fixed bottom-5 left-5 z-50 hidden no-print">
+    <div id="toast-box" class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 flex items-center gap-3 text-sm font-semibold">
+      <span id="toast-icon">✅</span>
+      <span id="toast-msg">تم التحديث بنجاح</span>
+    </div>
+  </div>
 
-            const manifest = {
-                name: "Urban Prep Management", short_name: "Urban Prep", start_url: ".", display: "standalone",
-                background_color: "#0F352E", theme_color: "#0F352E",
-                icons: [{ src: iconDataUrl, sizes: "512x512", type: "image/png" }]
-            };
-            const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-            document.getElementById('manifest-link').href = URL.createObjectURL(manifestBlob);
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+
+    <!-- ==================== TAB 1: VERTICAL ORDERING ==================== -->
+    <section id="tab-ordering" class="tab-panel space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <div class="max-w-2xl mx-auto space-y-4">
+          <div class="text-center pb-2 border-b border-slate-100">
+            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900">شاشة إدخال الطلبيات (رأسي لكل فرع)</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">اختر الفرع، أدخل الكميات لكل صنف (بدون تفاصيل العيش المعقدة)، وسجل رقم الواتساب لإرسال الفاتورة فور الاعتماد.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">الفرع / العميل الحالي</label>
+              <select id="vert-branch-select" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2 font-bold bg-slate-50 focus:outline-none focus:border-indigo-600">
+                <option value="kickN">فرع Kick N</option>
+                <option value="ichi">فرع ICHI</option>
+                <option value="kujiT">كوجي الترعة (KUJI Teraa)</option>
+                <option value="kujiG">كوجي جيهان (KUJI Gihan)</option>
+                <option value="arika">فرع أريكا (Arika)</option>
+                <option value="hpoint">فرع H.Point</option>
+                <option value="sense">فرع SENSE</option>
+                <option value="bsociety">فرع B' SOCIETY</option>
+                <option value="catering">كاترنج / Test</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">رقم موبايل الواتساب (لإرسال الفاتورة)</label>
+              <input type="text" id="vert-whatsapp-input" placeholder="مثال: 01012345678" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2 bg-slate-50 num-font font-bold focus:outline-none focus:border-indigo-600" />
+            </div>
+          </div>
+
+          <!-- Vertical Form List for Each Product -->
+          <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold text-slate-800">قائمة الأصناف (أدخل الكمية المطلوبة تحت بعضها):</span>
+              <span class="text-xs text-indigo-700 font-bold">السعر بالجنيه</span>
+            </div>
+
+            <div id="vertical-products-list" class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-2">
+            <div class="text-sm font-bold text-slate-700">
+              إجمالي قيمة طلبية الفرع: <span id="vert-total-val" class="text-emerald-700 font-extrabold text-lg num-font">0 ج.م</span>
+            </div>
+            <button id="btn-save-vert-order" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm px-6 py-3 rounded-xl shadow-md transition flex items-center gap-2">
+              <span>💾</span>
+              <span>حفظ طلبية هذا الفرع والانتقال للفرع التالي</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: INVOICE & WHATSAPP STUDIO ==================== -->
+    <section id="tab-invoice-studio" class="tab-panel hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 no-print">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900">مُولّد الفواتير وإرسال الواتساب الفوري</h2>
+            <p class="text-xs sm:text-sm text-slate-500">اختر الفرع، راجع الفاتورة المعتمدة من (جابر / محمد النجار / محمد أحمد)، واضغط إرسال عبر الواتساب برقم الموبايل المسجل.</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button id="btn-send-whatsapp" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2">
+              <span>📱</span>
+              <span>إرسال الفاتورة عبر الواتساب (WhatsApp)</span>
+            </button>
+            <button id="btn-download-pdf" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2">
+              <span>📥</span>
+              <span>تنزيل PDF</span>
+            </button>
+            <button id="btn-print-invoice" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2">
+              <span>🖨️</span>
+              <span>طباعة</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 pt-4 border-t border-slate-100">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">اختر الفرع للمعاينة</label>
+            <select id="inv-select-branch" class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 font-bold bg-slate-50 focus:outline-none focus:border-indigo-600">
+              <option value="kickN">Kick N</option>
+              <option value="ichi">ICHI</option>
+              <option value="kujiT">KUJI Teraa</option>
+              <option value="kujiG">KUJI Gihan</option>
+              <option value="arika">Arika</option>
+              <option value="hpoint">H.Point</option>
+              <option value="sense">SENSE</option>
+              <option value="bsociety">B' SOCIETY</option>
+              <option value="catering">كاترنج / Test</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">رقم الواتساب المسجل</label>
+            <input type="text" id="inv-whatsapp-display-input" placeholder="01012345678" class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 bg-slate-50 num-font font-bold" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">معتمد بواسطة الإدارة</label>
+            <select id="inv-approved-by" class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 font-bold bg-indigo-50 text-indigo-900">
+              <option value="أ/ جابر محمد">أ/ جابر محمد</option>
+              <option value="م/ محمد النجار">م/ محمد النجار</option>
+              <option value="محمد أحمد (مدير المطبخ)">محمد أحمد (مدير المطبخ)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Printable A4 Invoice Preview Card -->
+      <div id="invoice-print-wrapper" class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+        <div id="invoice-render-area" class="p-6 sm:p-10">
+          <div class="flex flex-wrap items-start justify-between gap-4 pb-6 border-b-2 border-slate-900">
+            <div class="flex items-center gap-3.5">
+              <div class="w-14 h-14 rounded-2xl bg-[#283618] text-[#e6eed8] border-2 border-[#648238] flex items-center justify-center text-xl font-extrabold num-font shadow-sm">
+                UP
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-extrabold uppercase tracking-widest px-2 py-0.5 rounded bg-[#e6eed8] text-[#283618] num-font">URBAN PREP</span>
+                  <span class="text-xs text-slate-500 font-bold">We prep. You serve</span>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-extrabold text-[#1f2b0f] mt-0.5">فاتورة توريد فرع</h2>
+                <div class="mt-1 inline-flex items-center gap-2 text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-md border border-indigo-200">
+                  <span id="inv-display-code">CLIENT CODE: KICK-01</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-left sm:text-right bg-slate-50 p-3.5 rounded-xl border border-slate-200 min-w-[230px]">
+              <div class="flex justify-between gap-4 text-xs text-slate-500 mb-1">
+                <span>اسم الفرع:</span>
+                <span id="inv-display-client" class="font-extrabold text-indigo-700 text-sm">Kick N</span>
+              </div>
+              <div class="flex justify-between gap-4 text-xs text-slate-500 mb-1">
+                <span>رقم الواتس:</span>
+                <span id="inv-display-whatsapp" class="font-bold text-slate-800 num-font">01000000000</span>
+              </div>
+              <div class="flex justify-between gap-4 text-xs text-slate-500">
+                <span>معتمد بواسطة:</span>
+                <span id="inv-display-approver" class="font-bold text-emerald-700">أ/ جابر محمد</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 overflow-x-auto">
+            <table class="w-full text-right border-collapse">
+              <thead>
+                <tr class="bg-slate-900 text-white text-xs sm:text-sm">
+                  <th class="py-2.5 px-3 border border-slate-800 w-12 text-center">#</th>
+                  <th class="py-2.5 px-3 border border-slate-800">الصنف (بدون تفاصيل العيش)</th>
+                  <th class="py-2.5 px-3 border border-slate-800 text-center w-28">الكمية</th>
+                  <th class="py-2.5 px-3 border border-slate-800 text-center w-28">سعر الوحدة</th>
+                  <th class="py-2.5 px-3 border border-slate-800 text-center w-32">الإجمالي</th>
+                </tr>
+              </thead>
+              <tbody id="invoice-items-tbody" class="divide-y divide-slate-200 text-xs sm:text-sm">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-6 flex justify-end">
+            <div class="bg-slate-900 text-white rounded-2xl p-5 w-full sm:w-80 space-y-2">
+              <div class="flex justify-between items-center text-xs text-slate-300">
+                <span>إجمالي قطع الساندوتشات:</span>
+                <span id="inv-total-qty" class="font-extrabold text-white num-font">0 قطعة</span>
+              </div>
+              <div class="border-t border-slate-700 pt-2 flex justify-between items-center">
+                <span class="text-sm font-extrabold text-amber-400">صافي الفاتورة:</span>
+                <span id="inv-net-total" class="text-xl font-extrabold text-amber-400 num-font">0 ج.م</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: OPEX & CUSTODY TRANSFERS ==================== -->
+    <section id="tab-opex" class="tab-panel hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-5">
+        <div>
+          <h2 class="text-lg font-extrabold text-slate-900">سجل المصروفات وتسليم العهد بين الأفراد</h2>
+          <p class="text-xs text-slate-500">تسجيل العهد النقدية المسلمة بين الأفراد (النجار، جابر، محمد أحمد) لتخصم تلقائياً من الفواتير والمسحوبات.</p>
+        </div>
+
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
+          <div class="lg:col-span-2">
+            <label class="block text-xs font-bold text-slate-600 mb-1">البيان / تفاصيل العهدة أو المصروف</label>
+            <input type="text" id="custody-desc" placeholder="مثال: تسليم عهدة نقدية أو ثمن خامات" class="w-full text-xs border border-slate-300 rounded-xl px-3 py-2 bg-white" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">المبلغ (ج.م)</label>
+            <input type="number" id="custody-amount" min="0" placeholder="0" class="w-full text-xs border border-slate-300 rounded-xl px-3 py-2 bg-white num-font font-bold" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">المسلم (من)</label>
+            <select id="custody-giver" class="w-full text-xs border border-slate-300 rounded-xl px-3 py-2 bg-white font-bold">
+              <option value="النجار">النجار</option>
+              <option value="جابر">جابر</option>
+              <option value="محمد أحمد">محمد أحمد</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">المستلم (إلى)</label>
+            <select id="custody-receiver" class="w-full text-xs border border-slate-300 rounded-xl px-3 py-2 bg-white font-bold">
+              <option value="محمد أحمد">محمد أحمد</option>
+              <option value="النجار">النجار</option>
+              <option value="جابر">جابر</option>
+            </select>
+          </div>
+
+          <div>
+            <button id="btn-add-custody" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl transition">
+              + تسجيل العهدة
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+          <table class="w-full text-right border-collapse text-xs">
+            <thead class="bg-slate-900 text-white">
+              <tr>
+                <th class="py-2.5 px-3">التاريخ</th>
+                <th class="py-2.5 px-3">البيان</th>
+                <th class="py-2.5 px-3 text-center">المبلغ</th>
+                <th class="py-2.5 px-3">المسلم (من)</th>
+                <th class="py-2.5 px-3">المستلم (إلى)</th>
+              </tr>
+            </thead>
+            <tbody id="custody-table-body" class="divide-y divide-slate-200">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: DASHBOARD ==================== -->
+    <section id="tab-dashboard" class="tab-panel hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <h2 class="text-lg font-extrabold text-slate-900 mb-3">الملخص المالي العام</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-indigo-600 text-white rounded-xl p-4">
+            <div class="text-xs text-indigo-100 font-bold">إجمالي المبيعات</div>
+            <div id="dash-sales" class="text-2xl font-extrabold mt-1 num-font">0 ج.م</div>
+          </div>
+          <div class="bg-rose-600 text-white rounded-xl p-4">
+            <div class="text-xs text-rose-100 font-bold">إجمالي المصروفات والعهد</div>
+            <div id="dash-opex" class="text-2xl font-extrabold mt-1 num-font">0 ج.م</div>
+          </div>
+          <div class="bg-emerald-600 text-white rounded-xl p-4">
+            <div class="text-xs text-emerald-100 font-bold">صافي الربح</div>
+            <div id="dash-profit" class="text-2xl font-extrabold mt-1 num-font">0 ج.م</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const PRODUCTS = [
+      { id: 1, name: "ساندوتش تركي", price: 85 },
+      { id: 2, name: "ساندوتش روست بيف", price: 90 },
+      { id: 3, name: "سيراتشا روست بيف", price: 100 },
+      { id: 4, name: "ميكس كولد كاتس", price: 100 },
+      { id: 5, name: "تاندوري تشيكن", price: 95 },
+      { id: 6, name: "رانش تشيكن", price: 95 },
+      { id: 7, name: "باربيكيو تشيكن", price: 95 },
+      { id: 8, name: "حلومي فوكاشيا", price: 90 },
+      { id: 9, name: "سلمون مدخن بيجل", price: 140 },
+      { id: 10, name: "تونة باجيت", price: 110 },
+      { id: 11, name: "كلوب ساندوتش", price: 90 },
+      { id: 12, name: "سيزر سالاد", price: 100 }
+    ];
+
+    let orderingState = {
+      kickN: {}, ichi: {}, kujiT: {}, kujiG: {}, arika: {}, hpoint: {}, sense: {}, bsociety: {}, catering: {}
+    };
+    let branchWhatsApp = {};
+    let custodyList = [];
+
+    function renderVerticalProductsList() {
+      const container = document.getElementById("vertical-products-list");
+      const branchKey = document.getElementById("vert-branch-select").value;
+      const currentBranchData = orderingState[branchKey] || {};
+
+      document.getElementById("vert-whatsapp-input").value = branchWhatsApp[branchKey] || "";
+
+      let html = "";
+      let branchTotal = 0;
+
+      PRODUCTS.forEach(prod => {
+        const qty = currentBranchData[prod.id] || 0;
+        branchTotal += qty * prod.price;
+        html += `
+          <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-slate-200">
+            <div>
+              <div class="font-extrabold text-slate-900 text-xs sm:text-sm">${prod.name}</div>
+              <div class="text-[11px] text-slate-500 num-font">${prod.price} ج.م للقطعة</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <input
+                type="number"
+                min="0"
+                step="1"
+                data-prod-id="${prod.id}"
+                value="${qty > 0 ? qty : ''}"
+                placeholder="0"
+                class="order-input w-20 text-center py-1.5 px-2 rounded-lg border border-slate-300 text-sm num-font font-bold"
+              />
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      document.getElementById("vert-total-val").textContent = `${branchTotal.toLocaleString()} ج.م`;
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-panel").forEach(sec => sec.classList.add("hidden"));
+      const target = document.getElementById(`tab-${tabId}`);
+      if (target) target.classList.remove("hidden");
+
+      document.querySelectorAll(".nav-tab").forEach(btn => {
+        if (btn.getAttribute("data-tab") === tabId) {
+          btn.className = "nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition whitespace-nowrap bg-indigo-600 text-white shadow-sm flex items-center gap-1.5";
+        } else {
+          btn.className = "nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap text-slate-300 hover:text-white hover:bg-slate-700/60 flex items-center gap-1.5";
         }
-        setupAppIconAndPWA();
+      });
 
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault(); deferredPrompt = e;
-            document.getElementById('installAppBtn').style.display = 'inline-block';
+      if (tabId === "invoice-studio") {
+        renderInvoicePreview();
+      } else if (tabId === "opex") {
+        renderCustodyTable();
+      } else if (tabId === "dashboard") {
+        updateDashboard();
+      }
+    }
+
+    function renderInvoicePreview() {
+      const branchKey = document.getElementById("inv-select-branch").value;
+      const phone = branchWhatsApp[branchKey] || "غير مسجل";
+      document.getElementById("inv-whatsapp-display-input").value = phone;
+      document.getElementById("inv-display-whatsapp").textContent = phone;
+      document.getElementById("inv-display-client").textContent = branchKey.toUpperCase();
+      document.getElementById("inv-display-approver").textContent = document.getElementById("inv-approved-by").value;
+
+      const itemsData = orderingState[branchKey] || {};
+      const tbody = document.getElementById("invoice-items-tbody");
+      let rowsHtml = "";
+      let totalQty = 0;
+      let totalVal = 0;
+
+      PRODUCTS.forEach(prod => {
+        const q = itemsData[prod.id] || 0;
+        if (q > 0) {
+          const lineVal = q * prod.price;
+          totalQty += q;
+          totalVal += lineVal;
+          rowsHtml += `
+            <tr>
+              <td class="py-2.5 px-3 border border-slate-200 text-center num-font">${prod.id}</td>
+              <td class="py-2.5 px-3 border border-slate-200 font-extrabold text-slate-900">${prod.name}</td>
+              <td class="py-2.5 px-3 border border-slate-200 text-center num-font font-bold text-indigo-700">${q}</td>
+              <td class="py-2.5 px-3 border border-slate-200 text-center num-font">${prod.price} ج.م</td>
+              <td class="py-2.5 px-3 border border-slate-200 text-center num-font font-extrabold">${lineVal.toLocaleString()} ج.م</td>
+            </tr>
+          `;
+        }
+      });
+
+      if (!rowsHtml) {
+        rowsHtml = `<tr><td colspan="5" class="py-6 text-center text-slate-400 font-bold">لا توجد طلبات مدخلة لهذا الفرع حالياً</td></tr>`;
+      }
+      tbody.innerHTML = rowsHtml;
+      document.getElementById("inv-total-qty").textContent = `${totalQty} قطعة`;
+      document.getElementById("inv-net-total").textContent = `${totalVal.toLocaleString()} ج.م`;
+    }
+
+    function sendWhatsAppInvoice() {
+      const branchKey = document.getElementById("inv-select-branch").value;
+      const phone = branchWhatsApp[branchKey];
+      if (!phone) {
+        alert("يرجى إدخال رقم واتساب صالح لهذا الفرع أولاً من شاشة الطلبيات!");
+        return;
+      }
+
+      const approver = document.getElementById("inv-approved-by").value;
+      const itemsData = orderingState[branchKey] || {};
+      let text = `مرحباً بك من Urban Prep 🌿\nفاتورة توريد فرع: *${branchKey.toUpperCase()}*\n--------------------\n`;
+      let total = 0;
+
+      PRODUCTS.forEach(prod => {
+        const q = itemsData[prod.id] || 0;
+        if (q > 0) {
+          const line = q * prod.price;
+          total += line;
+          text += `- ${prod.name}: (${q} قطعة) = ${line} ج.م\n`;
+        }
+      });
+
+      text += `--------------------\n*الإجمالي: ${total} ج.م*\nمعتمدة بواسطة: ${approver} ✅`;
+      const encoded = encodeURIComponent(text);
+      window.open(`https://wa.me/${phone}?text=${encoded}`, '_blank');
+    }
+
+    function renderCustodyTable() {
+      const tbody = document.getElementById("custody-table-body");
+      tbody.innerHTML = custodyList.map(c => `
+        <tr>
+          <td class="py-2 px-3 num-font">${c.date}</td>
+          <td class="py-2 px-3 font-bold">${c.desc}</td>
+          <td class="py-2 px-3 text-center num-font font-extrabold text-rose-600">${c.amount} ج.م</td>
+          <td class="py-2 px-3 font-bold text-slate-700">${c.giver}</td>
+          <td class="py-2 px-3 font-bold text-slate-700">${c.receiver}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="5" class="py-4 text-center text-slate-400">لا توجد عهد مسجلة بعد</td></tr>`;
+    }
+
+    function updateDashboard() {
+      let sales = 0;
+      Object.keys(orderingState).forEach(b => {
+        const items = orderingState[b];
+        PRODUCTS.forEach(p => { sales += (items[p.id] || 0) * p.price; });
+      });
+      let opex = custodyList.reduce((acc, x) => acc + x.amount, 0);
+      document.getElementById("dash-sales").textContent = `${sales.toLocaleString()} ج.م`;
+      document.getElementById("dash-opex").textContent = `${opex.toLocaleString()} ج.م`;
+      document.getElementById("dash-profit").textContent = `${(sales - opex).toLocaleString()} ج.م`;
+    }
+
+    function showToast(msg) {
+      const c = document.getElementById("toast-container");
+      document.getElementById("toast-msg").textContent = msg;
+      c.classList.remove("hidden");
+      setTimeout(() => c.classList.add("hidden"), 3000);
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderVerticalProductsList();
+
+      document.querySelectorAll(".nav-tab").forEach(btn => {
+        btn.addEventListener("click", () => switchTab(btn.getAttribute("data-tab")));
+      });
+
+      document.getElementById("vert-branch-select").addEventListener("change", renderVerticalProductsList);
+
+      document.getElementById("vertical-products-list").addEventListener("input", (e) => {
+        const inp = e.target.closest("input");
+        if (!inp) return;
+        const branchKey = document.getElementById("vert-branch-select").value;
+        const prodId = inp.getAttribute("data-prod-id");
+        if (!orderingState[branchKey]) orderingState[branchKey] = {};
+        orderingState[branchKey][prodId] = Math.max(0, parseFloat(inp.value) || 0);
+
+        let branchTotal = 0;
+        PRODUCTS.forEach(p => { branchTotal += (orderingState[branchKey][p.id] || 0) * p.price; });
+        document.getElementById("vert-total-val").textContent = `${branchTotal.toLocaleString()} ج.م`;
+      });
+
+      document.getElementById("btn-save-vert-order").addEventListener("click", () => {
+        const branchKey = document.getElementById("vert-branch-select").value;
+        const phone = document.getElementById("vert-whatsapp-input").value.trim();
+        branchWhatsApp[branchKey] = phone;
+        showToast(`✅ تم حفظ طلبية فرع ${branchKey.toUpperCase()} بنجاح برقم الواتس: ${phone || 'بدون رقم'}`);
+      });
+
+      document.getElementById("btn-send-whatsapp").addEventListener("click", sendWhatsAppInvoice);
+
+      document.getElementById("inv-select-branch").addEventListener("change", renderInvoicePreview);
+      document.getElementById("inv-approved-by").addEventListener("change", () => {
+        document.getElementById("inv-display-approver").textContent = document.getElementById("inv-approved-by").value;
+      });
+
+      document.getElementById("btn-add-custody").addEventListener("click", () => {
+        const desc = document.getElementById("custody-desc").value.trim();
+        const amount = parseFloat(document.getElementById("custody-amount").value) || 0;
+        const giver = document.getElementById("custody-giver").value;
+        const receiver = document.getElementById("custody-receiver").value;
+
+        if (!desc || amount <= 0) {
+          alert("يرجى إدخال البيان والمبلغ بشكل صحيح");
+          return;
+        }
+
+        custodyList.push({
+          date: new Date().toLocaleDateString("ar-EG"),
+          desc, amount, giver, receiver
         });
-        function installPWA() {
-            if (deferredPrompt) deferredPrompt.prompt();
-            else alert('لتثبيت التطبيق: افتح قائمة المتصفح واختار "تثبيت التطبيق" أو "إضافة إلى الشاشة الرئيسية".');
-        }
 
-        const defaultUsers = [
-            { name: "أ/ جابر محمد", username: "gaber", pass: "1234", role: "الإدارة", viewSales: true, canOpex: true, isAdmin: true },
-            { name: "م/ محمد النجار", username: "naggar", pass: "1234", role: "الإدارة", viewSales: true, canOpex: true, isAdmin: true },
-            { name: "محمد أحمد", username: "mohamed", pass: "1111", role: "مدير مطبخ", viewSales: false, canOpex: true, isAdmin: false },
-            { name: "مشرف تشغيل", username: "super", pass: "2222", role: "مشرف", viewSales: false, canOpex: false, isAdmin: false }
-        ];
+        document.getElementById("custody-desc").value = "";
+        document.getElementById("custody-amount").value = "";
+        renderCustodyTable();
+        showToast("✅ تم تسجيل العهدة بنجاح وخصمها من الحسابات");
+      });
 
-        let users = JSON.parse(localStorage.getItem('urbanPrepUsers')) || defaultUsers;
-        let orders = JSON.parse(localStorage.getItem('urbanPrepOrders')) || [];
-        let opexList = JSON.parse(localStorage.getItem('urbanPrepOpex')) || [];
-        let currentUser = null;
-
-        document.getElementById('orderDate').valueAsDate = new Date();
-        document.getElementById('opexDate').valueAsDate = new Date();
-
-        function handleLogin() {
-            const u = document.getElementById('loginUser').value.trim().toLowerCase();
-            const p = document.getElementById('loginPass').value.trim();
-            const found = users.find(user => user.username.toLowerCase() === u && user.pass === p);
-
-            if (!found) {
-                document.getElementById('loginError').style.display = 'block';
-                return;
-            }
-            currentUser = found;
-            document.getElementById('loginError').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'none';
-            applyPermissions();
-        }
-
-        function handleLogout() {
-            currentUser = null;
-            document.getElementById('loginPass').value = '';
-            document.getElementById('loginScreen').style.display = 'flex';
-        }
-
-        function applyPermissions() {
-            document.getElementById('currentUserBadge').innerText = `${currentUser.name} - ${currentUser.role}`;
-            document.getElementById('tabDashboard').classList.toggle('hidden', !currentUser.viewSales);
-            document.getElementById('tabClients').classList.toggle('hidden', !currentUser.viewSales);
-            document.getElementById('tabOpex').classList.toggle('hidden', !currentUser.canOpex);
-            document.getElementById('tabUsers').classList.toggle('hidden', !currentUser.isAdmin);
-
-            document.querySelectorAll('.sales-Perm-field, .sales-Perm-col').forEach(el => {
-                el.classList.toggle('hidden', !currentUser.viewSales);
-            });
-            document.querySelectorAll('.delete-Perm-col').forEach(el => {
-                el.classList.toggle('hidden', !currentUser.isAdmin);
-            });
-
-            if (!currentUser.isAdmin && currentUser.username === 'mohamed') {
-                document.getElementById('giverSelect').value = "محمد أحمد";
-            }
-
-            if (currentUser.viewSales) switchTab('dashboard', document.getElementById('tabDashboard'));
-            else switchTab('orders', document.getElementById('tabOrders'));
-        }
-
-        function switchTab(sectionId, btn) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(sectionId).classList.add('active');
-            if (btn) btn.classList.add('active');
-            renderAll();
-        }
-
-        function toggleOpexFields() {
-            const t = document.getElementById('opexType').value;
-            document.getElementById('receiverGroup').style.display = (t === 'تسليم عهدة') ? 'block' : 'none';
-        }
-
-        function syncProductPrice() {
-            const sel = document.getElementById('productSelect');
-            const price = sel.options[sel.selectedIndex].getAttribute('data-price');
-            document.getElementById('unitPriceInput').value = price;
-            calcOrderTotal();
-        }
-
-        function calcOrderTotal() {
-            const q = parseFloat(document.getElementById('qtyInput').value) || 0;
-            const up = parseFloat(document.getElementById('unitPriceInput').value) || 0;
-            document.getElementById('priceInput').value = q * up;
-        }
-
-        function saveData() {
-            localStorage.setItem('urbanPrepUsers', JSON.stringify(users));
-            localStorage.setItem('urbanPrepOrders', JSON.stringify(orders));
-            localStorage.setItem('urbanPrepOpex', JSON.stringify(opexList));
-            renderAll();
-        }
-
-        function addOrder() {
-            const date = document.getElementById('orderDate').value;
-            const client = document.getElementById('clientSelect').value;
-            const product = document.getElementById('productSelect').value;
-            const qty = parseInt(document.getElementById('qtyInput').value) || 0;
-            const sel = document.getElementById('productSelect');
-            const defaultPrice = parseFloat(sel.options[sel.selectedIndex].getAttribute('data-price'));
-            const unitPrice = currentUser.viewSales ? (parseFloat(document.getElementById('unitPriceInput').value) || defaultPrice) : defaultPrice;
-            const price = qty * unitPrice;
-            const status = currentUser.viewSales ? document.getElementById('paymentStatus').value : 'غير مدفوع';
-            const whatsappPhone = document.getElementById('whatsappPhone').value.trim();
-
-            if (qty > 0) {
-                orders.push({ id: Date.now(), date, client, product, qty, price, status, whatsappPhone, addedBy: currentUser.name });
-                saveData();
-                alert('تم تسجيل الصنف للفرع بنجاح. يمكنك إضافة صنف آخر لنفس الفرع أو الانتقال لفرع جديد.');
-            }
-        }
-
-        function addOpex() {
-            const date = document.getElementById('opexDate').value;
-            const type = document.getElementById('opexType').value;
-            const giver = document.getElementById('giverSelect').value;
-            const receiver = type === 'تسليم عهدة' ? document.getElementById('receiverSelect').value : '-';
-            const desc = document.getElementById('descInput').value.trim();
-            const amount = parseFloat(document.getElementById('amountInput').value) || 0;
-
-            if (desc && amount > 0) {
-                opexList.push({ id: Date.now(), date, type, giver, receiver, desc, amount, addedBy: currentUser.name });
-                document.getElementById('descInput').value = '';
-                document.getElementById('amountInput').value = '';
-                saveData();
-                alert('تم حفظ الحركة بنجاح');
-            }
-        }
-
-        function deleteOrder(id) {
-            if (!currentUser.isAdmin) return;
-            if (confirm('تأكيد حذف الطلبية؟')) { orders = orders.filter(o => o.id !== id); saveData(); }
-        }
-
-        function deleteOpex(id) {
-            if (!currentUser.isAdmin) return;
-            if (confirm('تأكيد حذف المصروف أو العهدة؟')) { opexList = opexList.filter(o => o.id !== id); saveData(); }
-        }
-
-        function togglePaid(id) {
-            if (!currentUser.viewSales) return;
-            const ord = orders.find(o => o.id === id);
-            if (ord) { ord.status = ord.status === 'مدفوع' ? 'غير مدفوع' : 'مدفوع'; saveData(); }
-        }
-
-        function sendWhatsApp(clientName) {
-            const clientOrders = orders.filter(o => o.client === clientName);
-            if (clientOrders.length === 0) { alert('لا توجد طلبات لهذا الفرع'); return; }
-            const phone = clientOrders[clientOrders.length - 1].whatsappPhone || '';
-            const total = clientOrders.reduce((s, o) => s + o.price, 0);
-            
-            let text = `مرحباً بك من Urban Prep 🌿\nفاتورة طلبات الفرع: *${clientName}*\n--------------------\n`;
-            clientOrders.forEach(o => {
-                text += `- ${o.product} (${o.qty} قطعة) = ${o.price} ج.م\n`;
-            });
-            text += `--------------------\n*الإجمالي الكلي: ${total} ج.م*\nتم الاعتماد بواسطة الإدارة ✅`;
-
-            const encoded = encodeURIComponent(text);
-            window.open(`https://wa.me/${phone}?text=${encoded}`, '_blank');
-        }
-
-        function saveNewUser() {
-            if (!currentUser.isAdmin) return;
-            const name = document.getElementById('newUserName').value.trim();
-            const username = document.getElementById('newUserLogin').value.trim().toLowerCase();
-            const pass = document.getElementById('newUserPass').value.trim();
-            const role = document.getElementById('newUserRole').value;
-            const viewSales = document.getElementById('permSales').value === 'yes';
-            const canOpex = document.getElementById('permOpex').value === 'yes';
-            const isAdmin = document.getElementById('permAdmin').value === 'yes';
-
-            if (!name || !username || !pass) { alert('يرجى ملء جميع الحقول'); return; }
-            const existingIndex = users.findIndex(u => u.username === username);
-            const userObj = { name, username, pass, role, viewSales, canOpex, isAdmin };
-            if (existingIndex >= 0) users[existingIndex] = userObj; else users.push(userObj);
-            saveData(); alert('تم حفظ المستخدم والصلاحيات بنجاح');
-        }
-
-        function deleteUser(username) {
-            if (username === 'gaber' || username === 'naggar') { alert('لا يمكن حذف حسابات الشركاء الأساسية!'); return; }
-            if (confirm('حذف المستخدم؟')) { users = users.filter(u => u.username !== username); saveData(); }
-        }
-
-        function renderAll() {
-            if (!currentUser) return;
-            
-            // خصم العهد المسلمة المستردة من إجمالي المصروفات الحسابية لو أمكن أو تجميعها
-            const totalSales = orders.reduce((s, o) => s + o.price, 0);
-            const totalOpex = opexList.reduce((s, i) => s + i.amount, 0);
-            const netProfit = totalSales - totalOpex;
-            const share = (netProfit / 2).toFixed(2);
-
-            document.getElementById('dashSales').innerText = totalSales + ' ج.م';
-            document.getElementById('dashOpex').innerText = totalOpex + ' ج.م';
-            document.getElementById('dashProfit').innerText = netProfit + ' ج.م';
-            document.getElementById('dashNaggar').innerText = share + ' ج.م';
-            document.getElementById('dashGaber').innerText = share + ' ج.م';
-
-            const oBody = document.getElementById('ordersTableBody');
-            oBody.innerHTML = '';
-            orders.forEach(o => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${o.date}</td><td><strong>${o.client}</strong></td><td>${o.product}</td><td>${o.qty}</td>
-                    <td class="${currentUser.viewSales ? '' : 'hidden'}">${o.price} ج.م</td>
-                    <td class="${currentUser.viewSales ? '' : 'hidden'}"><span class="status-${o.status === 'مدفوع' ? 'paid' : 'unpaid'}" style="cursor:pointer" onclick="togglePaid(${o.id})">${o.status}</span></td>
-                    <td>${o.whatsappPhone || '-'}</td>
-                    <td><small>${o.addedBy}</small></td>
-                    <td class="${currentUser.isAdmin ? '' : 'hidden'}"><button class="delete-btn" onclick="deleteOrder(${o.id})">حذف</button></td>`;
-                oBody.appendChild(tr);
-            });
-
-            const opBody = document.getElementById('opexTableBody');
-            opBody.innerHTML = '';
-            opexList.forEach(i => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${i.date}</td><td><strong>${i.type}</strong></td><td>${i.giver}</td><td>${i.receiver}</td><td>${i.desc}</td><td>${i.amount} ج.م</td>
-                    <td><small>${i.addedBy || '-'}</small></td>
-                    <td class="${currentUser.isAdmin ? '' : 'hidden'}"><button class="delete-btn" onclick="deleteOpex(${i.id})">حذف</button></td>`;
-                opBody.appendChild(tr);
-            });
-
-            if (currentUser.viewSales) {
-                const cBody = document.getElementById('clientsTableBody');
-                cBody.innerHTML = '';
-                [...new Set(orders.map(o => o.client))].forEach(cn => {
-                    const cOrders = orders.filter(o => o.client === cn);
-                    const tQty = cOrders.reduce((s, o) => s + o.qty, 0);
-                    const tVal = cOrders.reduce((s, o) => s + o.price, 0);
-                    const paid = cOrders.filter(o => o.status === 'مدفوع').reduce((s, o) => s + o.price, 0);
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `<td><strong>${cn}</strong></td><td>${tQty}</td><td>${tVal} ج.م</td><td class="status-paid">${paid} ج.م</td><td class="status-unpaid">${tVal - paid} ج.م</td>
-                        <td><button class="whatsapp-btn" onclick="sendWhatsApp('${cn}')">إرسال واتس 📱</button></td>`;
-                    cBody.appendChild(tr);
-                });
-            }
-
-            if (currentUser.isAdmin) {
-                const uBody = document.getElementById('usersTableBody');
-                uBody.innerHTML = '';
-                users.forEach(u => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `<td><strong>${u.name}</strong></td><td>${u.username}</td><td>${u.pass}</td><td>${u.role}</td><td>${u.viewSales ? '✅' : '❌'}</td><td>${u.canOpex ? '✅' : '❌'}</td><td>${u.isAdmin ? '✅' : '❌'}</td>
-                        <td>${(u.username !== 'gaber' && u.username !== 'naggar') ? `<button class="delete-btn" onclick="deleteUser('${u.username}')">حذف</button>` : 'أساسي'}</td>`;
-                    uBody.appendChild(tr);
-                });
-            }
-        }
-    </script>
+      document.getElementById("btn-download-app").addEventListener("click", () => {
+        const fullHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+        const blob = new Blob([fullHtml], { type: "text/html;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Urban_Prep_App.html";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast("✅ تم تحميل التطبيق بصيغة HTML جاهز للتشغيل على أي جهاز!");
+      });
+    });
+  </script>
 </body>
 </html>
